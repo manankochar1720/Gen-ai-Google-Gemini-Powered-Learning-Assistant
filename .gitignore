@@ -5,12 +5,5 @@ __pycache__/
 node_modules/
 feedback.json
 history.json
-venv/
-.venv/
-env/
-venv*
 .DS_Store
-*.mp4
-*.avi
-*.mov
-*.mkv
+
