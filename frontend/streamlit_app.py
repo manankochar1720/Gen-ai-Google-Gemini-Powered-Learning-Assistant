@@ -72,14 +72,8 @@ if os.path.exists(html_file_path):
             workspace_b64 = base64.b64encode(img_file.read()).decode("utf-8")
         html_content = html_content.replace("assets/robot_workspace.png", f"data:image/png;base64,{workspace_b64}")
 
-    # Automatically detect environment: Local Laptop vs Streamlit Cloud
-    is_local_machine = False
-    try:
-        # Check if the folder path belongs to your local D: drive structure
-        if "edugenie" in html_file_path.lower() and ("d:\\" in html_file_path.lower() or "d:/" in html_file_path.lower()):
-            is_local_machine = True
-    except Exception:
-        pass
+    # Automatically detect environment: Local Windows Laptop vs Linux Streamlit Cloud
+    is_local_machine = (os.name == 'nt')
 
     if is_local_machine:
         backend_url = "http://127.0.0.1:8000/api"
