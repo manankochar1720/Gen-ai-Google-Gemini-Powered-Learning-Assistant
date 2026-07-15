@@ -1281,7 +1281,19 @@
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     
     <script>
-        const BACKEND_URL = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
+        let isLocal = false;
+        try {
+            if (window.location.hostname && (window.location.hostname.includes("localhost") || window.location.hostname.includes("127.0.0.1"))) {
+                isLocal = true;
+            }
+        } catch (e) {}
+        try {
+            if (window.parent && window.parent.location && window.parent.location.hostname && (window.parent.location.hostname.includes("localhost") || window.parent.location.hostname.includes("127.0.0.1"))) {
+                isLocal = true;
+            }
+        } catch (e) {}
+
+        const BACKEND_URL = isLocal
             ? "http://127.0.0.1:8000/api"
             : "https://edugenie-backend-dxox.onrender.com/api";
         let activeSession = null; 
