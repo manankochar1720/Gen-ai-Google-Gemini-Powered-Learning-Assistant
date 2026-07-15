@@ -72,35 +72,6 @@ if os.path.exists(html_file_path):
             workspace_b64 = base64.b64encode(img_file.read()).decode("utf-8")
         html_content = html_content.replace("assets/robot_workspace.png", f"data:image/png;base64,{workspace_b64}")
 
-    # Inject backend URL dynamically (checks Streamlit secrets, then environment variables, then defaults to localhost)
-    if "BACKEND_URL" in st.secrets:
-        backend_url = st.secrets["BACKEND_URL"]
-    else:
-        backend_url = os.environ.get("BACKEND_URL", "http://127.0.0.1:8000/api")
-    
-    html_content = html_content.replace("BACKEND_URL_PLACEHOLDER", backend_url)
-
-    # Optional debug logic injected directly into HTML JS execution
-    debug_js = ""
-    if "debug" in st.query_params:
-        debug_js = f"""
-        const banner = document.createElement("div");
-        banner.style.position = "fixed";
-        banner.style.top = "0";
-        banner.style.left = "0";
-        banner.style.width = "100%";
-        banner.style.background = "#e11d48";
-        banner.style.color = "white";
-        banner.style.padding = "10px";
-        banner.style.textAlign = "center";
-        banner.style.zIndex = "999999";
-        banner.style.fontWeight = "bold";
-        banner.style.fontFamily = "Outfit, sans-serif";
-        banner.innerText = "🔧 DEBUG: Injected Backend URL is: {backend_url}";
-        document.body.appendChild(banner);
-        """
-    html_content = html_content.replace("// DEBUG_PLACEHOLDER", debug_js)
-
     # Serve full screen (using 680 height to fit typical laptop screens)
     st.components.v1.html(html_content, height=680, scrolling=True)
 else:
