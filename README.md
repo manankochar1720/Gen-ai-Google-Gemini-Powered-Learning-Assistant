@@ -1,75 +1,77 @@
-# 🧞 EduGenie Google Gemini Powered Learning Assistant
+# EduGenie - Google Gemini Powered Learning Assistant
 
-An AI-powered learning assistant that helps students understand complex topics, generate quizzes, and personalize their study plans using Google Gemini AI.
+## 🚀 Project Overview
+**EduGenie** is a state-of-the-art AI-powered personalized learning assistant designed to address the limitations of one-size-fits-all academic education. Traditional learning methodologies often fail to cater to the diverse learning speeds, comprehension levels, and cognitive preferences of individual students. This mismatch in teaching styles can lead to reduced engagement, incomplete topic mastery, and academic stress.
 
-Built using **Web Technologies (React/Next.js)**, **Node.js/Python Backend**, and the **Google Gemini API**.
+EduGenie bridges this gap by acting as an adaptive learning companion. The application leverages the **Google Gemini API** (`gemini-1.5-flash`) to dynamically tailor any academic topic, difficulty level (Beginner, Intermediate, Advanced), and learning style (Visual, Practical, Verbal, Intuitive) into customized study guides and analogical matrices. It also provides an interactive AI Tutor Chat Room for continuous doubt-clearing, dynamic Practice Quizzes with automated grading, and offline study report compilation using ReportLab PDF generation.
 
 ---
 
-## 📌 Features
+## ✨ Features
+- **Adaptive Topic Explainer**: Formulates structured explanations matching specific styles (e.g., *Visual* with analogical cards and summary tables, *Practical* with step-by-step code blocks).
+- **Interactive AI Tutor Chat Room**: Live, context-aware doubt-clearing room to resolve academic questions dynamically.
+- **Automated Practice Quizzes**: Generates randomized multiple-choice tests with immediate grading and detailed answer feedback.
+- **Offline Study Reports**: Compiles custom lesson guides and quiz results into beautiful, print-ready PDF reports.
+- **Persistent Logs**: Saves learning progress, quiz attempts, and user feedback into local JSON storage.
+- **Polished Glassmorphism UI**: Premium dashboard with glowing elements, transitions, and dark-shade theme toggling.
 
-- 🔍 Analyze learning materials and documents
-- 🧠 Generate personalized study guides using Gemini AI
-- 💬 Interactive chat for tutoring and Q&A
-- 📚 Topic summarization and explanation
-- 📝 Auto-generate quizzes to test knowledge
-- 👍👎 Collect user feedback on learning progress
+---
+
+## 🛠️ Tech Stack
+- **Backend**: FastAPI, Uvicorn, Pydantic
+- **Frontend**: Streamlit, HTML5, Vanilla JavaScript, CSS3
+- **GenAI Inference Engine**: Google Gemini API (`gemini-1.5-flash`)
+- **PDF Generation**: ReportLab
+- **Testing**: Pytest, FastAPI TestClient
 
 ---
 
 ## 🏗️ Project Architecture
-
 ```text
-User
-  ↓
-Frontend Web Application
-  ↓
-Backend API Server
-  ↓
-Services Layer
- ├── Content Analyzer
- ├── Chat/Tutor Engine
- ├── Quiz Generator
- └── Progress Tracker
-  ↓
-Database + Google Gemini API
+        User
+         ↓
+  Streamlit Frontend (index.html)
+         ↓
+    FastAPI Backend
+         ↓
+    API Router
+         ↓
+    ┌────┼──────────────┬──────────────┬──────────────┐
+    ↓    ↓              ↓              ↓              ↓
+  Topic  Tutor        Quiz           History        Feedback
+  Explainer Chat      Generator      Logger         Logger
+    └────┼──────────────┼──────────────┼──────────────┘
+         ↓              ↓              ↓              ↓
+         └──────────────┴──────┬───────┴──────────────┘
+                               ↓
+                        JSON Data Store & Gemini API
 ```
+
+### Component Descriptions:
+- **User**: Requests topics, selects learning style/difficulty, chats with tutor, takes quizzes, and downloads reports.
+- **Streamlit Frontend**: Serves our modern full-screen HTML interface with fluid transitions, onboarding widgets, and theme toggling.
+- **FastAPI Backend**: Hosts the endpoints (`/explain`, `/chat`, `/quiz/generate`, `/quiz/evaluate`, `/pdf/explanation`, `/pdf/quiz`, etc.).
+- **API Router**: Directs traffic to corresponding service modules.
+- **Gemini Service**: Orchestrates prompt construction and calls Google Gemini API.
+- **PDF Generator**: Compiles study guides using ReportLab.
 
 ---
 
-## 📂 Project Structure
+## 📸 Application Screenshots
 
-```text
-edugenie-learning-assistant/
-│
-├── backend/
-│   ├── main.py (or index.js)
-│   ├── routes/
-│   └── services/
-│
-├── frontend/
-│   ├── src/
-│   └── package.json
-│
-├── docs/
-│   ├── overview.md
-│   ├── architecture.md
-│   ├── features.md
-│   ├── setup.md
-│   └── technologies.md
-│
-├── README.md
-└── .env
-```
+### 1. Main Dashboard
+Provides an overview of the student's learning journey, including topics explained, quizzes taken, average score, and a personalized checklist guide.
+![Dashboard](images/dashboard.png)
 
----
+### 2. Concept Explainer
+Generates highly customized learning materials using selected difficulty levels and preferred study styles.
+![Concept Explainer](images/concept_explainer.png)
 
-## ⚙️ Technologies Used
+### 3. Practice Quiz Arena
+Dynamically creates multiple-choice question sets matching the user's requested topic and difficulty.
+![Quiz Setup](images/quiz_setup.png)
+![Quiz Active](images/quiz_active.png)
 
-| Technology | Purpose |
-|------------|---------|
-| Next.js / React | Frontend UI |
-| Node.js / Python | Backend API |
-| Google Gemini API | Core AI & NLP Processing |
-| MongoDB / PostgreSQL | Database Storage |
-| Git & GitHub | Version Control |
+### 4. History Log & Offline PDFs
+Maintains a log of past learning sessions, allowing the user to reload summaries or download offline PDF study guides.
+![History Log](images/history_log.png)
