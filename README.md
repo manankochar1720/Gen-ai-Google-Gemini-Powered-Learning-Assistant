@@ -1,5 +1,9 @@
 # EduGenie - Google Gemini Powered Learning Assistant
 
+## 🔗 Project Links
+- **GitHub Repository**: [manankochar1720 / Gen-ai-Google-Gemini-Powered-Learning-Assistant](https://github.com/manankochar1720/Gen-ai-Google-Gemini-Powered-Learning-Assistant)
+- **Demo Video Walkthrough**: [Google Drive Link](https://drive.google.com/file/d/1bKsPvajDTE8vF-AaRfxUXIssAQp171tJ/view?usp=sharing)
+
 ## 🚀 Project Overview
 **EduGenie** is a state-of-the-art AI-powered personalized learning assistant designed to address the limitations of one-size-fits-all academic education. Traditional learning methodologies often fail to cater to the diverse learning speeds, comprehension levels, and cognitive preferences of individual students. This mismatch in teaching styles can lead to reduced engagement, incomplete topic mastery, and academic stress.
 
