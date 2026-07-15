@@ -80,9 +80,11 @@ if os.path.exists(html_file_path):
     
     html_content = html_content.replace("BACKEND_URL_PLACEHOLDER", backend_url)
 
-    # Optional debug print for query parameter
+    # Optional debug logic injected directly into HTML JS execution
+    debug_js = ""
     if "debug" in st.query_params:
-        st.info(f"🔧 **Debug Info**: Active Backend URL injected is `{backend_url}`")
+        debug_js = f"alert('🔧 DEBUG: Injected Backend URL is: {backend_url}'); console.log('🔧 DEBUG:', '{backend_url}');"
+    html_content = html_content.replace("// DEBUG_PLACEHOLDER", debug_js)
 
     # Serve full screen (using 680 height to fit typical laptop screens)
     st.components.v1.html(html_content, height=680, scrolling=True)
