@@ -1,0 +1,9 @@
+streamlit
+fastapi
+uvicorn
+google-generativeai
+reportlab
+pytest
+httpx
+pydantic
+python-dotenv

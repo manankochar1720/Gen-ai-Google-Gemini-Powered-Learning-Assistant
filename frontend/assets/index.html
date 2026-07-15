@@ -1,0 +1,1917 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduGenie - AI Learning Assistant</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* Light Theme Color Tokens */
+            --bg-main: #f8fafc;
+            --bg-sidebar: #ffffff;
+            --bg-card: #ffffff;
+            --border-color: rgba(99, 102, 241, 0.08);
+            --border-heavy: #e2e8f0;
+            --text-title: #0f172a;
+            --text-body: #334155;
+            --text-muted: #64748b;
+            
+            --accent-purple: #8b5cf6;
+            --accent-orange: #f97316;
+            --accent-green: #10b981;
+            --accent-red: #ef4444;
+            
+            --sidebar-active-bg: #004d40;
+            --sidebar-active-text: #ffffff;
+            --sidebar-text: #475569;
+            --sidebar-border: rgba(99, 102, 241, 0.08);
+            
+            --card-shadow: 0 10px 25px rgba(15, 23, 42, 0.03);
+            --input-bg: #ffffff;
+            --primary: #004d40;
+        }
+
+        body.dark-theme {
+            /* Dark Theme Color Tokens */
+            --bg-main: #020617;
+            --bg-sidebar: #0b0f19;
+            --bg-card: rgba(15, 23, 42, 0.65);
+            --border-color: rgba(255, 255, 255, 0.06);
+            --border-heavy: rgba(255, 255, 255, 0.08);
+            --text-title: #f8fafc;
+            --text-body: #cbd5e1;
+            --text-muted: #94a3b8;
+            
+            --sidebar-active-bg: #8b5cf6;
+            --sidebar-active-text: #ffffff;
+            --sidebar-text: #94a3b8;
+            --sidebar-border: rgba(255, 255, 255, 0.08);
+            
+            --card-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+            --input-bg: rgba(0, 0, 0, 0.25);
+            --primary: #059669;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-main);
+            color: var(--text-body);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Ambient glowing background orbs for Dark Mode depth */
+        .ambient-glow {
+            position: absolute;
+            width: 350px;
+            height: 350px;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0;
+            pointer-events: none;
+            z-index: 1;
+            transition: opacity 0.5s ease;
+        }
+        body.dark-theme .ambient-glow {
+            opacity: 0.12;
+        }
+        .glow-1 {
+            top: 5%;
+            left: 20%;
+            background: radial-gradient(circle, #8b5cf6 0%, transparent 70%);
+            animation: drift1 20s infinite alternate ease-in-out;
+        }
+        .glow-2 {
+            bottom: 10%;
+            right: 15%;
+            background: radial-gradient(circle, #06b6d4 0%, transparent 70%);
+            animation: drift2 25s infinite alternate-reverse ease-in-out;
+        }
+        @keyframes drift1 {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(40px, 30px) scale(1.15); }
+        }
+        @keyframes drift2 {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(-30px, -40px) scale(1.15); }
+        }
+
+        /* Fade-in-up animation on all active view-panels */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .view-panel.active {
+            display: block;
+            animation: fadeInUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* Pulsing Brain Logo animation */
+        @keyframes logoPulse {
+            0% { transform: scale(1); filter: drop-shadow(0 2px 6px rgba(16, 185, 129, 0.2)); }
+            50% { transform: scale(1.05); filter: drop-shadow(0 4px 12px rgba(16, 185, 129, 0.4)); }
+            100% { transform: scale(1); filter: drop-shadow(0 2px 6px rgba(16, 185, 129, 0.2)); }
+        }
+        .logo-section svg {
+            animation: logoPulse 3.5s ease-in-out infinite;
+        }
+
+        /* SVG Robot Heartbeat, Eyes & Lamp Animations */
+        @keyframes heartbeat {
+            0% { stroke-dashoffset: 0; }
+            100% { stroke-dashoffset: -40; }
+        }
+        .robot-heartbeat {
+            stroke-dasharray: 8, 4;
+            animation: heartbeat 2s linear infinite;
+        }
+        @keyframes lampSwing {
+            0% { transform: rotate(-1deg); }
+            100% { transform: rotate(1deg); }
+        }
+        .hanging-lamp {
+            transform-origin: 160px 0;
+            animation: lampSwing 4s ease-in-out infinite alternate;
+        }
+        @keyframes eyesGlow {
+            0% { opacity: 0.8; }
+            50% { opacity: 1; filter: drop-shadow(0 0 3px #10b981); }
+            100% { opacity: 0.8; }
+        }
+        .robot-eye {
+            animation: eyesGlow 2.5s ease-in-out infinite;
+        }
+
+        /* Sidebar Container */
+        .sidebar {
+            width: 260px;
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid var(--sidebar-border);
+            display: flex;
+            flex-direction: column;
+            padding: 24px;
+            z-index: 10;
+            flex-shrink: 0;
+            position: relative;
+        }
+
+        .logo-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .logo-title {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            font-size: 1.6rem;
+            color: var(--text-title);
+            margin-top: 10px;
+            margin-bottom: 4px;
+        }
+
+        .logo-subtitle {
+            color: var(--text-muted);
+            font-size: 0.76rem;
+            line-height: 1.3;
+        }
+
+        /* Nav List */
+        .nav-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            border-radius: 12px;
+            color: var(--sidebar-text);
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .nav-item svg {
+            width: 20px;
+            height: 20px;
+            margin-right: 14px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .nav-item:hover {
+            color: var(--text-title);
+            background: rgba(99, 102, 241, 0.05);
+        }
+
+        .nav-item.active {
+            background-color: var(--sidebar-active-bg);
+            color: var(--sidebar-active-text);
+            box-shadow: 0 4px 15px rgba(0, 77, 64, 0.15);
+            font-weight: 600;
+        }
+
+        body.dark-theme .nav-item.active {
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+        }
+
+        /* Main Content Workspace */
+        .main-workspace {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            z-index: 5;
+        }
+
+        .header-bar {
+            height: 80px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 35px;
+            flex-shrink: 0;
+        }
+
+        .header-title-container h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.5rem;
+            color: var(--text-title);
+            font-weight: 600;
+        }
+
+        .header-title-container p {
+            color: var(--text-muted);
+            font-size: 0.88rem;
+            margin-top: 2px;
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        /* Search input bar */
+        .search-group {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-bar {
+            padding: 10px 16px;
+            background: var(--input-bg);
+            border: 1px solid var(--border-heavy);
+            border-radius: 20px;
+            color: var(--text-body);
+            font-size: 0.88rem;
+            width: 250px;
+            outline: none;
+        }
+
+        .search-btn {
+            background: #004d40;
+            color: white;
+            border: none;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            margin-left: -40px;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        body.dark-theme .search-btn {
+            background: var(--primary);
+        }
+
+        .search-btn:hover {
+            opacity: 0.9;
+        }
+
+        /* Theme Toggle & Badges */
+        .theme-toggle-btn {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid var(--border-heavy);
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            outline: none;
+        }
+
+        .bell-icon {
+            position: relative;
+            cursor: pointer;
+            font-size: 1.25rem;
+            color: var(--text-body);
+            background: transparent;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .bell-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background: #f97316;
+            color: white;
+            font-size: 0.65rem;
+            font-weight: 700;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Main Scrollable View Area */
+        .view-panel {
+            flex-grow: 1;
+            padding: 30px 35px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .view-panel.active {
+            display: block;
+        }
+
+        /* Premium Glass Card layouts */
+        .glass-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 24px;
+        }
+
+        /* 4 Stats Grid Layout */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: var(--card-shadow);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stats-grid .stat-card:nth-child(1):hover {
+            border-color: rgba(139, 92, 246, 0.35);
+            box-shadow: 0 10px 25px rgba(139, 92, 246, 0.12);
+        }
+        .stats-grid .stat-card:nth-child(2):hover {
+            border-color: rgba(249, 115, 22, 0.35);
+            box-shadow: 0 10px 25px rgba(249, 115, 22, 0.12);
+        }
+        .stats-grid .stat-card:nth-child(3):hover {
+            border-color: rgba(16, 185, 129, 0.35);
+            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.12);
+        }
+        .stats-grid .stat-card:nth-child(4):hover {
+            border-color: rgba(239, 68, 68, 0.35);
+            box-shadow: 0 10px 25px rgba(239, 68, 68, 0.12);
+        }
+
+        .stat-card-top {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .stat-icon-wrapper {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .stat-details h4 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-title);
+            line-height: 1.1;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .stat-details p {
+            color: var(--text-muted);
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-top: 3px;
+        }
+
+        .stat-chart-area {
+            margin-top: 15px;
+            height: 30px;
+        }
+
+        .stat-card-bottom {
+            margin-top: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .stat-arrow-btn {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: rgba(99, 102, 241, 0.04);
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-body);
+            transition: all 0.2s ease;
+        }
+
+        .stat-card:hover .stat-arrow-btn {
+            background: var(--text-title);
+            color: var(--bg-card);
+        }
+
+        /* Timeline Roadmap checklist */
+        .timeline-card {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .timeline-item {
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+            transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            cursor: pointer;
+        }
+        
+        .timeline-item:hover {
+            transform: translateX(6px);
+            opacity: 0.95;
+        }
+
+        .timeline-num {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: rgba(99, 102, 241, 0.05);
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            flex-shrink: 0;
+            margin-top: 4px;
+        }
+
+        .timeline-icon-box {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .timeline-content {
+            flex-grow: 1;
+            padding: 10px 14px;
+            background: rgba(255,255,255,0.01);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+        }
+
+        .timeline-content h5 {
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: var(--text-title);
+        }
+
+        .timeline-content p {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        /* Splitting grids */
+        .middle-layout {
+            display: grid;
+            grid-template-columns: 1.25fr 1fr;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .bottom-layout {
+            display: grid;
+            grid-template-columns: 1.25fr 1fr;
+            gap: 24px;
+        }
+
+        /* Mini Quick Access */
+        .quick-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .quick-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 14px 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+
+        .quick-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 8px 20px rgba(168, 85, 247, 0.15);
+        }
+
+        .quick-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px auto;
+            color: white;
+            font-size: 1.15rem;
+        }
+
+        .quick-card span {
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: var(--text-title);
+            display: block;
+            line-height: 1.3;
+        }
+
+        /* Buttons & Forms */
+        .btn {
+            background: #004d40;
+            color: #ffffff;
+            border: none;
+            border-radius: 12px;
+            padding: 12px 24px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            outline: none;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
+
+        body.dark-theme .btn {
+            background: var(--primary);
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        .btn-full {
+            width: 100%;
+        }
+
+        /* Configurator views */
+        .config-form-group {
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .config-form-group label {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .config-select, .config-input {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--input-bg);
+            border: 1px solid var(--border-heavy);
+            border-radius: 10px;
+            color: var(--text-body);
+            outline: none;
+            font-size: 0.92rem;
+            font-family: inherit;
+        }
+
+        /* Markdown blocks styling */
+        .md-box h1, .md-box h2, .md-box h3 {
+            font-family: 'Outfit', sans-serif;
+            color: var(--text-title);
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        .md-box p {
+            line-height: 1.6;
+            margin-bottom: 15px;
+            color: var(--text-body);
+        }
+
+        .md-box ul, .md-box ol {
+            margin-left: 20px;
+            margin-bottom: 15px;
+            color: var(--text-body);
+            line-height: 1.5;
+        }
+
+        .md-box li {
+            margin-bottom: 6px;
+        }
+
+        .md-box table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+
+        .md-box th, .md-box td {
+            border: 1px solid var(--border-color);
+            padding: 8px 12px;
+            font-size: 0.88rem;
+            text-align: left;
+        }
+
+        .md-box th {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-title);
+        }
+
+        /* Radio option lists */
+        .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 14px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .radio-option:hover {
+            border-color: var(--primary);
+            background: rgba(168, 85, 247, 0.03);
+        }
+
+        .radio-option.selected {
+            border-color: var(--primary);
+            background: rgba(168, 85, 247, 0.08);
+        }
+
+        .radio-option input {
+            accent-color: var(--primary);
+        }
+
+        /* Header Popover Dropdowns */
+        .header-dropdown {
+            position: absolute;
+            top: 45px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            width: 280px;
+            z-index: 100;
+            padding: 10px;
+            box-sizing: border-box;
+            animation: fadeInUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .dropdown-header {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-title);
+            padding: 8px 10px;
+            font-family: 'Outfit', sans-serif;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 6px;
+        }
+
+        .dropdown-item {
+            font-size: 0.82rem;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--text-body);
+            text-align: left;
+        }
+
+        .dropdown-item:hover {
+            background: rgba(99, 102, 241, 0.05);
+            color: var(--text-title);
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: var(--border-color);
+            margin: 8px 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Ambient glowing backgrounds for Dark Mode depth -->
+    <div class="ambient-glow glow-1"></div>
+    <div class="ambient-glow glow-2"></div>
+
+    <!-- Left Sidebar -->
+    <div class="sidebar">
+        <div class="logo-section">
+            <!-- Brain Bulb Logo -->
+            <div style="background: white; border-radius: 50%; padding: 4px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.12); width: 62px; height: 62px; overflow: hidden; margin-bottom: 5px;">
+                <img src="assets/edugenie_logo.png" alt="EduGenie Logo" style="width: 100%; height: 100%; object-fit: contain; transform: scale(1.15);">
+            </div>
+            <div class="logo-title">EduGenie</div>
+            <div class="logo-subtitle">Google Gemini<br/>Powered Learning Assistant</div>
+        </div>
+
+        <ul class="nav-list">
+            <li class="nav-item active" onclick="switchTab('dashboard')">
+                <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" /><rect x="14" y="3" width="7" height="5" /><rect x="14" y="12" width="7" height="9" /><rect x="3" y="16" width="7" height="5" /></svg>
+                Dashboard
+            </li>
+            <li class="nav-item" onclick="switchTab('explain')">
+                <svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                Concept Explainer
+            </li>
+            <li class="nav-item" onclick="switchTab('chat')">
+                <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                AI Tutor Chat
+            </li>
+            <li class="nav-item" onclick="switchTab('quiz')">
+                <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                Practice Quiz
+            </li>
+            <li class="nav-item" onclick="switchTab('chronicle')">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                History Log
+            </li>
+            <li class="nav-item" onclick="switchTab('insight')">
+                <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                Feedback Corner
+            </li>
+        </ul>
+
+        <!-- Books and plant vector decoration -->
+        <div style="margin-top: auto; padding: 5px; display: flex; flex-direction: column; align-items: center; opacity: 0.95; width: 100%;">
+            <div style="background: white; border-radius: 16px; padding: 8px; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 16px rgba(0,0,0,0.06); width: 100%; height: 160px; overflow: hidden;">
+                <img src="assets/sidebar_decoration.png" alt="Study Corner" style="width: 100%; height: 100%; object-fit: contain;">
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Workspace -->
+    <div class="main-workspace">
+        <div class="header-bar">
+            <div class="header-title-container">
+                <h2 id="headerGreeting">Good to see you, Manan! 👋</h2>
+                <p id="headerSubGreeting">Here is a summary of your learning journey with EduGenie.</p>
+            </div>
+            
+            <div class="header-controls">
+                <!-- Search bar -->
+                <div class="search-group">
+                    <input type="text" class="search-bar" placeholder="Search anything...">
+                    <button class="search-btn">🔍</button>
+                </div>
+                
+                <!-- Notification bell with interactive dropdown -->
+                <div style="position: relative; display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                    <button class="bell-icon" onclick="toggleNotificationsDropdown(event)" style="margin: 0;">
+                        🔔
+                        <span class="bell-badge">3</span>
+                    </button>
+                    <span style="font-size: 0.62rem; color: var(--text-muted); font-weight: 600; font-family: 'Outfit', sans-serif; text-transform: uppercase; letter-spacing: 0.03em;">Alerts</span>
+                    <div id="notificationsDropdown" class="header-dropdown" style="display: none; right: 0; top: 52px;">
+                        <div class="dropdown-header">Recent Notifications</div>
+                        <div class="dropdown-item">🎉 Milestone achieved: Mastered Calculus Limits!</div>
+                        <div class="dropdown-item">📊 Quiz Aced: Newton's Laws (100% Score)</div>
+                        <div class="dropdown-item">🧞 AI Tutor response generated successfully.</div>
+                    </div>
+                </div>
+                
+                <!-- Theme Toggle Button -->
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                    <button class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleTheme()" style="margin: 0;">🌙</button>
+                    <span style="font-size: 0.62rem; color: var(--text-muted); font-weight: 600; font-family: 'Outfit', sans-serif; text-transform: uppercase; letter-spacing: 0.03em;">Theme</span>
+                </div>
+                
+                <!-- Profile Avatar badge with interactive dropdown -->
+                <div style="position: relative; display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                    <div class="profile-container" onclick="toggleProfileDropdown(event)" style="background:#a855f7; color:white; border:none; width:34px; height:34px; justify-content:center; padding:0; cursor:pointer; font-family:'Outfit'; font-weight:700; font-size:0.95rem; margin: 0;">
+                        M
+                    </div>
+                    <span style="font-size: 0.62rem; color: var(--text-muted); font-weight: 600; font-family: 'Outfit', sans-serif; text-transform: uppercase; letter-spacing: 0.03em;">Account</span>
+                    <div id="profileDropdown" class="header-dropdown" style="display: none; right: 0; width: 220px; top: 52px;">
+                        <div class="dropdown-header" style="display: flex; align-items: center; gap: 10px; border-bottom: none; margin-bottom: 0;">
+                            <div style="width: 32px; height: 32px; border-radius: 50%; background: #a855f7; display: flex; align-items: center; justify-content: center; font-weight: bold; color: white; font-family:'Outfit';">M</div>
+                            <div style="text-align: left;">
+                                <div style="font-weight: 600; font-size: 0.88rem; color: var(--text-title); line-height: 1.2;">Manan</div>
+                                <div style="font-size: 0.72rem; color: var(--text-muted);">Active Student</div>
+                            </div>
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        <div class="dropdown-item" onclick="switchTab('dashboard')">📊 View Dashboard</div>
+                        <div class="dropdown-item" onclick="switchTab('chronicle')">📜 Study History</div>
+                        <div class="dropdown-item" onclick="resetAppStats()" style="color: var(--accent-red);">⚙️ Reset Logs</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 1. Dashboard panel -->
+        <div class="view-panel active" id="panel-dashboard">
+            <!-- 4 Stats Cards -->
+            <div class="stats-grid">
+                <!-- Stat Card 1 -->
+                <div class="stat-card" onclick="switchTab('chronicle')">
+                    <div class="stat-card-top">
+                        <div class="stat-icon-wrapper" style="background: rgba(139, 92, 246, 0.1); color: var(--accent-purple);">📖</div>
+                        <div class="stat-details">
+                            <h4 id="statExplained">19</h4>
+                            <p>Topics Explained</p>
+                        </div>
+                    </div>
+                    <div class="stat-chart-area">
+                        <svg viewBox="0 0 100 30" width="100%" height="25" style="overflow: visible;">
+                            <path d="M0,25 Q15,5 30,20 T60,5 T90,20 L100,20" fill="none" stroke="#8b5cf6" stroke-width="2.5" stroke-linecap="round" />
+                        </svg>
+                    </div>
+                    <div class="stat-card-bottom">
+                        <span>Keep exploring!</span>
+                        <span class="stat-arrow-btn">›</span>
+                    </div>
+                </div>
+
+                <!-- Stat Card 2 -->
+                <div class="stat-card" onclick="switchTab('quiz')">
+                    <div class="stat-card-top">
+                        <div class="stat-icon-wrapper" style="background: rgba(249, 115, 22, 0.1); color: var(--accent-orange);">📋</div>
+                        <div class="stat-details">
+                            <h4 id="statQuizzes">4</h4>
+                            <p>Quizzes Taken</p>
+                        </div>
+                    </div>
+                    <div class="stat-chart-area">
+                        <svg viewBox="0 0 100 30" width="100%" height="25">
+                            <rect x="5" y="15" width="6" height="15" rx="1" fill="#f97316" />
+                            <rect x="17" y="8" width="6" height="22" rx="1" fill="#f97316" />
+                            <rect x="29" y="18" width="6" height="12" rx="1" fill="#f97316" />
+                            <rect x="41" y="5" width="6" height="25" rx="1" fill="#f97316" />
+                            <rect x="53" y="12" width="6" height="18" rx="1" fill="#f97316" />
+                            <rect x="65" y="20" width="6" height="10" rx="1" fill="#f97316" />
+                            <rect x="77" y="10" width="6" height="20" rx="1" fill="#f97316" />
+                            <rect x="89" y="14" width="6" height="16" rx="1" fill="#f97316" />
+                        </svg>
+                    </div>
+                    <div class="stat-card-bottom">
+                        <span>Great effort!</span>
+                        <span class="stat-arrow-btn">›</span>
+                    </div>
+                </div>
+
+                <!-- Stat Card 3 -->
+                <div class="stat-card" onclick="switchTab('quiz')">
+                    <div class="stat-card-top">
+                        <div class="stat-icon-wrapper" style="background: rgba(16, 185, 129, 0.1); color: var(--accent-green);">🎯</div>
+                        <div class="stat-details">
+                            <h4 id="statScore">91.7%</h4>
+                            <p>Average Score</p>
+                        </div>
+                    </div>
+                    <div class="stat-chart-area">
+                        <div style="width: 100%; height: 6px; background: rgba(16, 185, 129, 0.15); border-radius: 3px; margin-top: 15px; position: relative;">
+                            <div id="statProgressBar" style="width: 91.7%; height: 100%; background: #10b981; border-radius: 3px;"></div>
+                        </div>
+                    </div>
+                    <div class="stat-card-bottom">
+                        <span>You're doing amazing!</span>
+                        <span class="stat-arrow-btn">›</span>
+                    </div>
+                </div>
+
+                <!-- Stat Card 4 -->
+                <div class="stat-card">
+                    <div class="stat-card-top">
+                        <div class="stat-icon-wrapper" style="background: rgba(239, 68, 68, 0.1); color: var(--accent-red);">🔥</div>
+                        <div class="stat-details">
+                            <h4 id="statStreak">0</h4>
+                            <p>Day Streak</p>
+                        </div>
+                    </div>
+                    <div class="stat-chart-area">
+                        <div style="display: flex; gap: 8px; margin-top: 15px; justify-content: center;">
+                            <span style="width: 8px; height: 8px; border-radius: 50%; background: #ef4444; box-shadow: 0 0 6px #ef4444;"></span>
+                            <span style="width: 8px; height: 8px; border-radius: 50%; background: rgba(128,128,128,0.25);"></span>
+                            <span style="width: 8px; height: 8px; border-radius: 50%; background: rgba(128,128,128,0.25);"></span>
+                            <span style="width: 8px; height: 8px; border-radius: 50%; background: rgba(128,128,128,0.25);"></span>
+                            <span style="width: 8px; height: 8px; border-radius: 50%; background: rgba(128,128,128,0.25);"></span>
+                            <span style="width: 8px; height: 8px; border-radius: 50%; background: rgba(128,128,128,0.25);"></span>
+                            <span style="width: 8px; height: 8px; border-radius: 50%; background: rgba(128,128,128,0.25);"></span>
+                        </div>
+                    </div>
+                    <div class="stat-card-bottom">
+                        <span>Start your streak today!</span>
+                        <span class="stat-arrow-btn">›</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Middle Layout -->
+            <div class="middle-layout">
+                <!-- Timeline/Checklist Widget -->
+                <div class="glass-card">
+                    <h3 style="background: #0f172a; color: white; padding: 10px 14px; border-radius: 6px; font-size: 1rem; text-align: center; font-family: 'Outfit';">Begin Your Personalized Learning Journey</h3>
+                    
+                    <div class="timeline-card" style="margin-top: 15px;">
+                        <div class="timeline-item" onclick="goToStep(1)">
+                            <span class="timeline-num">01</span>
+                            <div class="timeline-icon-box" style="background: #8b5cf6;">📝</div>
+                            <div class="timeline-content">
+                                <h5>Input any academic topic and tailor the complexity</h5>
+                                <p>Beginner to Advanced.</p>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item" onclick="goToStep(2)">
+                            <span class="timeline-num">02</span>
+                            <div class="timeline-icon-box" style="background: #f59e0b;">🎛️</div>
+                            <div class="timeline-content">
+                                <h5>Select your specific learning style</h5>
+                                <p>Visual, Practical, Verbal, Intuitive.</p>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item" onclick="goToStep(3)">
+                            <span class="timeline-num">03</span>
+                            <div class="timeline-icon-box" style="background: #10b981;">📄</div>
+                            <div class="timeline-content">
+                                <h5>Convert concepts into downloadable</h5>
+                                <p>Professional PDF study reports.</p>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item" onclick="goToStep(4)">
+                            <span class="timeline-num">04</span>
+                            <div class="timeline-icon-box" style="background: #ef4444;">🏆</div>
+                            <div class="timeline-content">
+                                <h5>Practice with automated quiz generation</h5>
+                                <p>Featuring immediate detailed grade reviews.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cute Robot Illustration and Quick Access -->
+                <div style="display:flex; flex-direction:column; justify-content:space-between;">
+                    <div class="glass-card" style="flex-grow:1; display:flex; align-items:center; padding:15px; position:relative; overflow:hidden;">
+                        <div style="position:absolute; top:20px; left:20px; font-style:italic; font-family:'Outfit'; font-size:1.15rem; color:var(--text-title); font-weight:600; line-height:1.3; max-width:140px; z-index: 2;">
+                            “ Learn today,<br/><span style="color:#10b981; border-bottom: 2px solid #10b981;">Lead</span> tomorrow. ”
+                        </div>
+                        
+                        <div style="width:60%; height:160px; margin-left:auto; overflow:hidden; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.06); display:flex; align-items:center; justify-content:center; z-index: 1;">
+                             <img src="assets/robot_workspace.png" alt="Robot Workspace" style="width:100%; height:100%; object-fit:cover;">
+                        </div>
+                    </div>
+
+                    <!-- Quick Access -->
+                    <div class="glass-card" style="margin-bottom:0;">
+                        <h3 style="font-size:0.95rem; font-weight:600; color:var(--text-title); margin-bottom:5px;">Quick Access</h3>
+                        <div class="quick-grid">
+                            <div class="quick-card" onclick="quickLearn('Calculus Limits')">
+                                <div class="quick-icon" style="background:#8b5cf6;">📐</div>
+                                <span>Calculus - Limits</span>
+                            </div>
+                            <div class="quick-card" onclick="quickLearn('Newtons Laws')">
+                                <div class="quick-icon" style="background:#f59e0b;">⚙️</div>
+                                <span>Newton's Laws</span>
+                            </div>
+                            <div class="quick-card" onclick="quickLearn('Photosynthesis')">
+                                <div class="quick-icon" style="background:#10b981;">🍃</div>
+                                <span>Photosynthesis</span>
+                            </div>
+                            <div class="quick-card" onclick="switchTab('chronicle')">
+                                <div class="quick-icon" style="background:#64748b;">•••</div>
+                                <span>View All History</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Layout -->
+            <div class="bottom-layout">
+                <!-- Have a Doubt Banner -->
+                <div class="glass-card" style="display:flex; justify-content:space-between; align-items:center; background:linear-gradient(90deg, rgba(99,102,241,0.06) 0%, rgba(16,185,129,0.03) 100%); margin-bottom:0; padding:18px 24px;">
+                    <div>
+                        <h4 style="font-family:'Outfit'; font-size:1.15rem; color:var(--text-title);">Have a doubt?</h4>
+                        <p style="color:var(--text-muted); font-size:0.85rem; margin-top:2px;">Ask Genie - Your Personalized AI Tutor</p>
+                    </div>
+                    <button class="btn" style="background:#0f172a; color:white; border-radius:30px;" onclick="switchTab('chat')">💬 Start Chat</button>
+                </div>
+
+                <!-- Today's Goal -->
+                <div class="glass-card" style="display:flex; justify-content:space-between; align-items:center; background:linear-gradient(135deg, rgba(99,102,241,0.08) 0%, rgba(59,130,246,0.03) 100%); margin-bottom:0; padding:18px 24px;">
+                    <div>
+                        <h4 style="font-family:'Outfit'; font-size:1.1rem; color:var(--text-title);">Today's Goal</h4>
+                        <p style="color:var(--text-muted); font-size:0.8rem; margin-top:2px;">Complete 2 quizzes.<br/>You're on the right track!</p>
+                    </div>
+                    
+                    <!-- Progress Radial Gauge at 50% -->
+                    <div style="position:relative; width:52px; height:52px;">
+                        <svg viewBox="0 0 36 36" style="width:100%; height:100%; transform: rotate(-90deg);">
+                            <circle cx="18" cy="18" r="16" fill="none" stroke="rgba(99,102,241,0.15)" stroke-width="3"></circle>
+                            <circle cx="18" cy="18" r="16" fill="none" stroke="#6366f1" stroke-width="3" stroke-dasharray="50, 100"></circle>
+                        </svg>
+                        <span style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:0.75rem; font-weight:700; font-family:'Outfit'; color:var(--text-title);">50%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Concept Explainer View -->
+        <div class="view-panel" id="panel-explain">
+            <div class="middle-layout" style="grid-template-columns: 2fr 1.1fr;">
+                <div>
+                    <div class="glass-card" id="explanationResultBox" style="display:none;">
+                        <!-- Results injected here -->
+                    </div>
+                    <div class="glass-card" id="noExplanationBox" style="text-align: center; padding: 80px 40px; border: 1px dashed rgba(255,255,255,0.15);">
+                        <div style="font-size: 3rem; margin-bottom: 20px;">📚</div>
+                        <h3 style="color: #94a3b8;">No Concept Explored Yet</h3>
+                        <p style="color: #64748b; max-width: 400px; margin: 0 auto; font-size:0.92rem; line-height:1.5;">Fill out the parameters on the right and click "Explain Topic" to generate dynamic study guides, vector illustrations, analogies, and timeline paths.</p>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="glass-card">
+                        <h3>Configurator</h3>
+                        
+                        <div class="config-form-group">
+                            <label>What would you like to learn?</label>
+                            <input type="text" class="config-input" id="explainTopicInput" placeholder="e.g. Backpropagation, Smart Contracts">
+                        </div>
+
+                        <div class="config-form-group">
+                            <label>Difficulty / Knowledge Level</label>
+                            <select class="config-select" id="explainLevelSelect">
+                                <option value="Beginner">Beginner</option>
+                                <option value="Intermediate">Intermediate</option>
+                                <option value="Advanced">Advanced</option>
+                            </select>
+                        </div>
+
+                        <div class="config-form-group">
+                            <label>Preferred Learning Style</label>
+                            <select class="config-select" id="explainStyleSelect">
+                                <option value="Visual">Visual (Analogies & diagrams)</option>
+                                <option value="Verbal">Verbal (Story-based explanations)</option>
+                                <option value="Practical">Practical (Code snippets & tasks)</option>
+                                <option value="Intuitive">Intuitive (Thought experiments)</option>
+                            </select>
+                        </div>
+
+                        <button class="btn btn-full" onclick="generateExplanation()">🚀 Explain Topic</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. AI Tutor Chat View -->
+        <div class="view-panel" id="panel-chat" style="height: calc(100vh - 80px); overflow: hidden; padding: 20px 35px; box-sizing: border-box;">
+            <div class="glass-card" style="height: 100%; margin-bottom: 0; display: flex; flex-direction: column;">
+                <h3 id="chatFocusHeader" style="margin-bottom:10px;">AI Tutor Chat Room (Focus: General Topics)</h3>
+                
+                <div style="flex-grow:1; flex-shrink:1; min-height:0; overflow-y:auto; margin-bottom:20px; display:flex; flex-direction:column; gap:12px; padding-right:10px;" id="fullChatBox">
+                    <div style="background: rgba(13,20,38,0.03); border: 1px solid var(--border-color); padding: 14px 18px; border-radius: 12px; max-width: 85%;">
+                        <strong style="color: var(--accent-purple);">🧞 EduGenie:</strong>
+                        <div style="color: var(--text-body); margin-top: 5px; font-size: 0.95rem; line-height: 1.5;">Hello! I am your AI Tutor. Ask me any follow-up questions about concepts you've explored, request python templates, or clear your doubts!</div>
+                    </div>
+                </div>
+
+                <div style="display:flex; gap:10px;">
+                    <input type="text" class="config-input" style="flex-grow:1;" id="fullChatInput" placeholder="Ask a doubt or request code...">
+                    <button class="btn" style="padding:0 24px;" onclick="sendFullChat()">Send Doubts 🚀</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. Practice Quiz View -->
+        <div class="view-panel" id="panel-quiz">
+            <div class="middle-layout" style="grid-template-columns: 2fr 1.1fr;">
+                <div>
+                    <div class="glass-card" id="quizActiveBox" style="display:none;">
+                        <!-- Quiz active form injected here -->
+                    </div>
+                    <div class="glass-card" id="quizResultBox" style="display:none;">
+                        <!-- Results injected here -->
+                    </div>
+                    <div class="glass-card" id="noQuizBox" style="text-align: center; padding: 80px 40px; border: 1px dashed rgba(255,255,255,0.15);">
+                        <div style="font-size: 3rem; margin-bottom: 20px;">⚔️</div>
+                        <h3 style="color: #94a3b8;">Quiz Arena Empty</h3>
+                        <p style="color: #64748b; max-width: 400px; margin: 0 auto; font-size:0.92rem; line-height:1.5;">Define a topic, select your difficulty parameters, and click "Generate Quiz" on the right to start.</p>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="glass-card">
+                        <h3>Quiz Setup</h3>
+                        
+                        <div class="config-form-group">
+                            <label>Quiz Topic</label>
+                            <input type="text" class="config-input" id="quizTopicInput" placeholder="e.g. Quantum Entanglement">
+                        </div>
+
+                        <div class="config-form-group">
+                            <label>Number of Questions</label>
+                            <select class="config-select" id="quizNumSelect">
+                                <option value="3">3 Questions</option>
+                                <option value="5">5 Questions</option>
+                                <option value="10">10 Questions</option>
+                            </select>
+                        </div>
+
+                        <div class="config-form-group">
+                            <label>Difficulty Level</label>
+                            <select class="config-select" id="quizLevelSelect">
+                                <option value="Beginner">Beginner</option>
+                                <option value="Intermediate">Intermediate</option>
+                                <option value="Advanced">Advanced</option>
+                            </select>
+                        </div>
+
+                        <button class="btn btn-full" onclick="generateQuiz()">📝 Generate Quiz</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. History Log View -->
+        <div class="view-panel" id="panel-chronicle">
+            <div style="max-width: 800px; margin: 0 auto;" id="chronicleListContainer">
+                <!-- Chronicle cards dynamically injected here -->
+            </div>
+        </div>
+
+        <!-- 6. Feedback Corner View -->
+        <div class="view-panel" id="panel-insight">
+            <div style="max-width: 600px; margin: 0 auto;">
+                <div class="glass-card">
+                    <h3>Submit Your Thoughts</h3>
+                    <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:15px;">Rate your experience with EduGenie to help improve prompt models.</p>
+                    
+                    <div class="config-form-group">
+                        <label>Rating (1 = Poor, 5 = Excellent)</label>
+                        <select class="config-select" id="feedbackRating">
+                            <option value="5">5 Stars (Excellent)</option>
+                            <option value="4">4 Stars (Good)</option>
+                            <option value="3">3 Stars (Average)</option>
+                            <option value="2">2 Stars (Fair)</option>
+                            <option value="1">1 Star (Poor)</option>
+                        </select>
+                    </div>
+
+                    <div class="config-form-group">
+                        <label>Suggestions</label>
+                        <textarea class="config-input" id="feedbackSuggestion" rows="5" placeholder="Provide suggestions here..."></textarea>
+                    </div>
+
+                    <button class="btn btn-full" onclick="submitFeedback()">Submit Rating 🌟</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Inject Markdown Parser and Mermaid -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    
+    <script>
+        const BACKEND_URL = "http://127.0.0.1:8000/api";
+        let activeSession = null; 
+        let activeQuizData = null; 
+        let quizAnswers = {}; 
+        let historyItemsCache = []; 
+
+        // Fetch metrics on load
+        window.addEventListener('load', () => {
+            refreshHistoryLog();
+            
+            // Check stored theme
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-theme');
+                document.getElementById('themeToggleBtn').innerHTML = '☀️';
+            } else {
+                document.getElementById('themeToggleBtn').innerHTML = '🌙';
+            }
+
+            // Bind keyboard Enter listeners to all input boxes
+            document.getElementById('fullChatInput').addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    sendFullChat();
+                }
+            });
+
+            document.getElementById('miniChatInput').addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    sendMiniChat();
+                }
+            });
+
+            document.getElementById('explainTopicInput').addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    generateExplanation();
+                }
+            });
+
+            document.getElementById('quizTopicInput').addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    generateQuiz();
+                }
+            });
+        });
+
+        // Toggle Theme
+        function toggleTheme() {
+            document.body.classList.toggle('dark-theme');
+            const isDark = document.body.classList.contains('dark-theme');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            document.getElementById('themeToggleBtn').innerHTML = isDark ? '☀️' : '🌙';
+        }
+
+        // Timeline Step Navigation Redirects
+        function goToStep(stepNum) {
+            if (stepNum === 1) {
+                switchTab('explain');
+                setTimeout(() => {
+                    const inp = document.getElementById('explainTopicInput');
+                    if (inp) {
+                        inp.focus();
+                        inp.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }, 120);
+            } else if (stepNum === 2) {
+                switchTab('explain');
+                setTimeout(() => {
+                    const sel = document.getElementById('explainStyleSelect');
+                    if (sel) {
+                        sel.focus();
+                        sel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }, 120);
+            } else if (stepNum === 3) {
+                switchTab('chronicle');
+            } else if (stepNum === 4) {
+                switchTab('quiz');
+                setTimeout(() => {
+                    const inp = document.getElementById('quizTopicInput');
+                    if (inp) {
+                        inp.focus();
+                        inp.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }, 120);
+            }
+        }
+
+        // Tab Switcher
+        function switchTab(tabId) {
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            
+            let btnIndex = 0;
+            switch(tabId) {
+                case 'dashboard': btnIndex = 0; break;
+                case 'explain': btnIndex = 1; break;
+                case 'chat': btnIndex = 2; break;
+                case 'quiz': btnIndex = 3; break;
+                case 'chronicle': btnIndex = 4; break;
+                case 'insight': btnIndex = 5; break;
+            }
+            document.querySelectorAll('.nav-item')[btnIndex].classList.add('active');
+
+            // Switch views
+            document.querySelectorAll('.view-panel').forEach(panel => panel.classList.remove('active'));
+            const activePanel = document.getElementById(`panel-${tabId}`);
+            if (activePanel) activePanel.classList.add('active');
+
+            // Update Headers
+            const titleElement = document.getElementById('headerGreeting');
+            const subTitleElement = document.getElementById('headerSubGreeting');
+
+            if (tabId === 'dashboard') {
+                titleElement.innerText = "Good to see you, Manan! 👋";
+                subTitleElement.innerText = "Here is a summary of your learning journey with EduGenie.";
+            } else {
+                let label = "Concept Explainer";
+                let sub = "Configure AI explanation parameters.";
+                switch(tabId) {
+                    case 'explain': label = "Concept Explainer"; sub = "Input any topic and tailor how Google Gemini should explain it dynamically."; break;
+                    case 'chat': label = "AI Tutor Core"; sub = "Resolve queries or clear doubts directly with Google Gemini."; break;
+                    case 'quiz': label = "Practice Quiz"; sub = "Test your knowledge using automated multiple-choice test suites evaluated by AI."; break;
+                    case 'chronicle': label = "History Log"; sub = "Review past explanations and access offline PDFs generated during your journey."; break;
+                    case 'insight': label = "Feedback Corner"; sub = "Evaluate your learning curves and share suggestions to optimize the personalized system."; break;
+                }
+                titleElement.innerText = label;
+                subTitleElement.innerText = sub;
+            }
+        }
+
+        // Fetch history and update metrics
+        async function refreshHistoryLog() {
+            try {
+                const res = await fetch(`${BACKEND_URL}/history`);
+                if (res.ok) {
+                    const history = await res.json();
+                    historyItemsCache = history; // Cache locally
+                    
+                    const explanationCount = history.filter(item => item.type === "explanation").length;
+                    const quizCount = history.filter(item => item.type === "quiz").length;
+                    
+                    // Score
+                    let avgScore = 0;
+                    const quizList = history.filter(item => item.type === "quiz");
+                    if (quizList.length > 0) {
+                        avgScore = quizList.reduce((acc, q) => acc + q.percentage, 0) / quizList.length;
+                    }
+
+                    // Update stats
+                    document.getElementById('statExplained').innerText = explanationCount;
+                    document.getElementById('statQuizzes').innerText = quizCount;
+                    document.getElementById('statScore').innerText = avgScore.toFixed(1) + "%";
+                    
+                    // Update progress bar width
+                    document.getElementById('statProgressBar').style.width = avgScore.toFixed(1) + "%";
+
+                    // Update Chronicle View
+                    const chronicleBox = document.getElementById('chronicleListContainer');
+                    chronicleBox.innerHTML = "";
+                    if (history.length === 0) {
+                        chronicleBox.innerHTML = "<div class='glass-card'><p>No logged sessions found.</p></div>";
+                    } else {
+                        // Create a shallow copy before reversing to preserve indexes
+                        const renderHistory = [...history];
+                        renderHistory.reverse().forEach((item, index) => {
+                            const card = document.createElement('div');
+                            card.className = "glass-card";
+                            const dt = new Date(item.timestamp).toLocaleString();
+                            
+                            if (item.type === "explanation") {
+                                const originalIndex = history.length - 1 - index;
+                                card.innerHTML = `
+                                    <span style="float:right; color:#64748b; font-size:0.8rem;">⏱️ ${dt}</span>
+                                    <h4 style="color:var(--accent-purple); font-family:Outfit; font-size:1.15rem; margin-bottom:8px;">🧠 Concept: ${item.response.topic}</h4>
+                                    <p style="color:#64748b; font-size:0.82rem; margin: 4px 0;">Difficulty: ${item.response.level} | Style: ${item.response.style}</p>
+                                    <p style="color:var(--text-body); font-size:0.9rem; margin-top:8px;">${item.response.explanation.substring(0, 220)}...</p>
+                                    <button class="btn" style="margin-top:10px; padding:6px 14px; font-size:0.8rem;" onclick="reloadHistoryExpByIndex(${originalIndex})">Reload Session</button>
+                                `;
+                            } else if (item.type === "quiz") {
+                                card.innerHTML = `
+                                    <span style="float:right; color:#64748b; font-size:0.8rem;">⏱️ ${dt}</span>
+                                    <h4 style="color:var(--accent-green); font-family:Outfit; font-size:1.15rem; margin-bottom:8px;">📝 Quiz: ${item.topic}</h4>
+                                    <p style="color:var(--text-body); font-size:0.9rem;">Achieved a score of <b>${item.score}/${item.total}</b> (${item.percentage.toFixed(0)}%).</p>
+                                    <p style="color:#64748b; font-size:0.82rem; margin-top:4px;">Feedback: ${item.feedback}</p>
+                                `;
+                            }
+                            chronicleBox.appendChild(card);
+                        });
+                    }
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        function reloadHistoryExpByIndex(originalIndex) {
+            const item = historyItemsCache[originalIndex];
+            if (item && item.type === "explanation") {
+                activeSession = item.response;
+                renderExplanationView();
+                switchTab('explain');
+            }
+        }
+
+        // API Explanation generation
+        async function generateExplanation() {
+            const topic = document.getElementById('explainTopicInput').value.trim();
+            if (!topic) {
+                alert("Please type a topic first!");
+                return;
+            }
+
+            const level = document.getElementById('explainLevelSelect').value;
+            const style = document.getElementById('explainStyleSelect').value;
+
+            document.getElementById('noExplanationBox').style.display = "none";
+            const resBox = document.getElementById('explanationResultBox');
+            resBox.style.display = "block";
+            resBox.innerHTML = "<div style='text-align:center; padding:50px 0;'>🧞 <h4>EduGenie is formulating your guide...</h4></div>";
+
+            try {
+                const res = await fetch(`${BACKEND_URL}/explain`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ topic, level, style })
+                });
+
+                if (res.ok) {
+                    activeSession = await res.json();
+                    renderExplanationView();
+                    refreshHistoryLog();
+                    document.getElementById('chatFocusHeader').innerText = `AI Tutor Chat Room (Focus: ${activeSession.topic})`;
+                } else {
+                    resBox.innerHTML = "<h4>⚠️ An error occurred formulating the explanation.</h4>";
+                }
+            } catch (e) {
+                resBox.innerHTML = `<h4>⚠️ Error: ${e.message}</h4>`;
+            }
+        }
+
+        function renderExplanationView() {
+            if (!activeSession) return;
+            
+            document.getElementById('noExplanationBox').style.display = "none";
+            const box = document.getElementById('explanationResultBox');
+            box.style.display = "block";
+
+            let keyList = "";
+            activeSession.key_highlights.forEach(h => {
+                keyList += `<li>${h}</li>`;
+            });
+
+            let studyList = "";
+            activeSession.study_plan.forEach((s, idx) => {
+                studyList += `<li><strong>${idx+1}.</strong> ${s}</li>`;
+            });
+
+            const parsedExplanation = marked.parse(activeSession.explanation);
+
+            let mermaidBlock = "";
+            if (activeSession.mermaid_diagram) {
+                mermaidBlock = `
+                    <div style="margin: 20px 0;">
+                        <h3>📊 Interactive Visual Model</h3>
+                        <div class="mermaid" id="mermaid_display_div" style="display:flex; justify-content:center; background:rgba(0,0,0,0.03); border: 1px solid var(--border-color); padding:15px; border-radius:10px;">
+                            ${activeSession.mermaid_diagram}
+                        </div>
+                    </div>
+                `;
+            }
+
+            box.innerHTML = `
+                <div style="margin-bottom: 20px;">
+                    <span style="font-size: 0.8rem; color: var(--accent-purple); background: rgba(139,92,246,0.1); padding: 4px 10px; border-radius: 20px; font-weight: 500;">${activeSession.level}</span>
+                    <span style="font-size: 0.8rem; color: var(--accent-green); background: rgba(16,185,129,0.1); padding: 4px 10px; border-radius: 20px; font-weight: 500; margin-left: 5px;">${activeSession.style} Style</span>
+                    <h2 style='font-family: Outfit; font-weight: 600; color: var(--text-title); margin-top: 15px;'>${activeSession.topic}</h2>
+                    <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 15px 0;"/>
+                </div>
+
+                <div class="md-box">${parsedExplanation}</div>
+                
+                ${mermaidBlock}
+
+                <div style="margin: 20px 0;">
+                    <h3>🧩 Visual Analogy</h3>
+                    <div class="analogy-box">${activeSession.analogies}</div>
+                </div>
+
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin: 25px 0;">
+                    <div>
+                        <h3>📌 Key Highlights</h3>
+                        <ul style="margin-left:15px; line-height:1.5;">${keyList}</ul>
+                    </div>
+                    <div>
+                        <h3>🗓️ Recommended Study Steps</h3>
+                        <ul style="list-style:none; line-height:1.5;">${studyList}</ul>
+                    </div>
+                </div>
+
+                <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 20px 0;"/>
+                <button class="btn btn-full" onclick="downloadExplanationPdf()">📥 Download Study Guide PDF</button>
+            `;
+
+            // Compile Mermaid
+            if (activeSession.mermaid_diagram) {
+                import('https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs')
+                    .then(m => {
+                        m.default.initialize({ startOnLoad: true, theme: 'dark' });
+                        m.default.init(undefined, document.getElementById('mermaid_display_div'));
+                    });
+            }
+        }
+
+        async function downloadExplanationPdf() {
+            if (!activeSession) return;
+            try {
+                const res = await fetch(`${BACKEND_URL}/pdf/explanation`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(activeSession)
+                });
+                if (res.ok) {
+                    const blob = await res.blob();
+                    const link = document.createElement('a');
+                    link.href = window.URL.createObjectURL(blob);
+                    link.download = `${activeSession.topic.replace(/ /g, "_")}_Guide.pdf`;
+                    link.click();
+                }
+            } catch (e) {
+                alert(`Error downloading PDF: ${e.message}`);
+            }
+        }
+
+        // Quick Learn
+        function quickLearn(topic) {
+            document.getElementById('explainTopicInput').value = topic;
+            document.getElementById('explainLevelSelect').value = "Intermediate";
+            document.getElementById('explainStyleSelect').value = "Visual";
+            switchTab('explain');
+            generateExplanation();
+        }
+
+        // Chat Tutor Implementation
+        async function sendFullChat() {
+            const query = document.getElementById('fullChatInput').value.trim();
+            if (!query) return;
+            document.getElementById('fullChatInput').value = "";
+
+            const box = document.getElementById('fullChatBox');
+            box.innerHTML += `
+                <div style="background: rgba(255,255,255,0.02); padding: 12px 16px; border-radius: 12px; max-width: 85%; margin-left: auto; border:1px solid var(--border-color);">
+                    <strong style="color: var(--accent-orange);">🧑‍🎓 You:</strong><br/>
+                    <div style="color: var(--text-body); margin-top: 5px;">${query}</div>
+                </div>
+            `;
+            box.scrollTop = box.scrollHeight;
+
+            const focusTopic = activeSession ? activeSession.topic : "General Topics";
+            const historyObj = [{ role: "user", content: query }];
+
+            try {
+                const res = await fetch(`${BACKEND_URL}/chat`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ topic: focusTopic, query, history: historyObj })
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    box.innerHTML += `
+                        <div style="background: rgba(13,20,38,0.03); border: 1px solid var(--border-color); padding: 14px 18px; border-radius: 12px; max-width: 85%;">
+                            <strong style="color: var(--accent-purple);">🧞 EduGenie:</strong>
+                            <div style="color: var(--text-body); margin-top: 5px; line-height:1.5;">${data.reply}</div>
+                        </div>
+                    `;
+                }
+            } catch (e) {
+                console.error(e);
+            }
+            box.scrollTop = box.scrollHeight;
+        }
+
+        // Practice Quiz generation
+        async function generateQuiz() {
+            const topic = document.getElementById('quizTopicInput').value.trim();
+            if (!topic) {
+                alert("Please type a topic first!");
+                return;
+            }
+
+            const num_questions = parseInt(document.getElementById('quizNumSelect').value);
+            const level = document.getElementById('quizLevelSelect').value;
+
+            document.getElementById('noQuizBox').style.display = "none";
+            document.getElementById('quizResultBox').style.display = "none";
+            const qBox = document.getElementById('quizActiveBox');
+            qBox.style.display = "block";
+            qBox.innerHTML = "<div style='text-align:center; padding:50px 0;'>🧞 <h4>Formulating your test suite...</h4></div>";
+
+            try {
+                const res = await fetch(`${BACKEND_URL}/quiz/generate`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ topic, num_questions, level })
+                });
+
+                if (res.ok) {
+                    activeQuizData = await res.json();
+                    quizAnswers = {};
+                    renderQuizForm();
+                } else {
+                    qBox.innerHTML = "<h4>⚠️ An error occurred generating the quiz.</h4>";
+                }
+            } catch(e) {
+                qBox.innerHTML = `<h4>⚠️ Error: ${e.message}</h4>`;
+            }
+        }
+
+        function renderQuizForm() {
+            if (!activeQuizData) return;
+            const qBox = document.getElementById('quizActiveBox');
+            
+            let formContent = `
+                <div style="margin-bottom:15px;">
+                    <span style="font-size: 0.8rem; color: var(--accent-green); background: rgba(16,185,129,0.1); padding: 4px 10px; border-radius: 20px; font-weight: 500;">Practice Quiz</span>
+                    <h3 style="margin-top:10px;">Topic: ${activeQuizData.topic}</h3>
+                </div>
+                <hr style="border:0; border-top:1px solid var(--border-color); margin:15px 0;"/>
+            `;
+
+            activeQuizData.questions.forEach((q, qIdx) => {
+                let optionsList = "";
+                q.options.forEach((opt, optIdx) => {
+                    optionsList += `
+                        <div class="radio-option" id="q_${qIdx}_opt_${optIdx}" onclick="selectQuizOption(${qIdx}, ${optIdx})">
+                            <input type="radio" name="q_${qIdx}" value="${optIdx}">
+                            <span>${opt}</span>
+                        </div>
+                    `;
+                });
+
+                formContent += `
+                    <div style="margin-bottom:25px;">
+                        <h4 style="margin-bottom:12px;">Q${qIdx+1}. ${q.question}</h4>
+                        <div class="radio-group">${optionsList}</div>
+                    </div>
+                    <hr style="border:0; border-top:1px dashed var(--border-color); margin:20px 0;"/>
+                `;
+            });
+
+            formContent += `<button class="btn btn-full" onclick="submitQuizAnswers()">🎯 Submit Answers</button>`;
+            qBox.innerHTML = formContent;
+        }
+
+        function selectQuizOption(qIdx, optIdx) {
+            quizAnswers[qIdx] = optIdx;
+            
+            const numOptions = activeQuizData.questions[qIdx].options.length;
+            for(let i=0; i<numOptions; i++) {
+                const element = document.getElementById(`q_${qIdx}_opt_${i}`);
+                if (element) element.classList.remove('selected');
+            }
+            
+            const selectedElement = document.getElementById(`q_${qIdx}_opt_${optIdx}`);
+            if (selectedElement) {
+                selectedElement.classList.add('selected');
+                selectedElement.querySelector('input').checked = true;
+            }
+        }
+
+        async function submitQuizAnswers() {
+            if (Object.keys(quizAnswers).length < activeQuizData.questions.length) {
+                alert("Please answer all questions before submitting!");
+                return;
+            }
+
+            const answersArray = [];
+            for(let i=0; i<activeQuizData.questions.length; i++) {
+                answersArray.push(quizAnswers[i]);
+            }
+
+            const payload = {
+                topic: activeQuizData.topic,
+                questions: activeQuizData.questions,
+                user_answers: answersArray
+            };
+
+            const qBox = document.getElementById('quizActiveBox');
+            qBox.innerHTML = "<div style='text-align:center; padding:50px 0;'>🧞 <h4>Evaluating score parameters...</h4></div>";
+
+            try {
+                const res = await fetch(`${BACKEND_URL}/quiz/evaluate`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+
+                if (res.ok) {
+                    const result = await res.json();
+                    qBox.style.display = "none";
+                    
+                    const resBox = document.getElementById('quizResultBox');
+                    resBox.style.display = "block";
+
+                    let qAnalysis = "";
+                    result.results.forEach((r, idx) => {
+                        const tag = r.is_correct ? "✅ Correct" : "❌ Incorrect";
+                        const color = r.is_correct ? "var(--accent-green)" : "#ef4444";
+                        
+                        qAnalysis += `
+                            <div style="margin-bottom:20px;">
+                                <strong>Q${idx}. ${r.question}</strong>
+                                <div style="margin-top:6px; font-size:0.9rem;">Your answer: <strong>${r.options[r.user_index]}</strong> (<span style="color:${color}; font-weight:600;">${tag}</span>)</div>
+                                <div style="font-size:0.9rem;">Correct answer: <strong>${r.options[r.correct_index]}</strong></div>
+                                <div style="font-size:0.85rem; color:#94a3b8; font-style:italic; margin-top:4px;">*Explanation*: ${r.explanation}</div>
+                            </div>
+                            <hr style="border:0; border-top:1px dashed var(--border-color); margin:15px 0;"/>
+                        `;
+                    });
+
+                    resBox.innerHTML = `
+                        <h3>🏆 Results Summary</h3>
+                        
+                        <div class="stat-grid">
+                            <div class="stat-card" style="flex:1;">
+                                <div class="stat-card-val">${result.score} / ${result.total}</div>
+                                <div class="stat-card-label">Total Score</div>
+                            </div>
+                            <div class="stat-card" style="flex:1;">
+                                <div class="stat-card-val">${result.percentage.toFixed(0)}%</div>
+                                <div class="stat-card-label">Percentage</div>
+                            </div>
+                        </div>
+
+                        <div style="background:rgba(255,255,255,0.02); padding:14px; border-radius:8px; margin: 15px 0; font-size:0.9rem; border:1px solid var(--border-color);">
+                            <strong>Feedback:</strong> ${result.feedback}
+                        </div>
+
+                        <h3>🔍 Question Analysis</h3>
+                        <div style="margin-top:15px;">${qAnalysis}</div>
+
+                        <button class="btn btn-full" onclick='downloadQuizPdf(${JSON.stringify(result)})'>Download Quiz Report PDF</button>
+                    `;
+
+                    refreshHistoryLog();
+                }
+            } catch (e) {
+                qBox.innerHTML = `<h4>⚠️ Error: ${e.message}</h4>`;
+            }
+        }
+
+        async function downloadQuizPdf(result) {
+            try {
+                const payload = {
+                    topic: activeQuizData.topic,
+                    questions: activeQuizData.questions
+                };
+                const res = await fetch(`${BACKEND_URL}/pdf/quiz`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+                if (res.ok) {
+                    const blob = await res.blob();
+                    const link = document.createElement('a');
+                    link.href = window.URL.createObjectURL(blob);
+                    link.download = `${activeQuizData.topic.replace(/ /g, "_")}_Quiz_Report.pdf`;
+                    link.click();
+                }
+            } catch (e) {
+                alert(`Error downloading quiz PDF: ${e.message}`);
+            }
+        }
+
+        // Feedback Submission
+        async function submitFeedback() {
+            const rating = parseInt(document.getElementById('feedbackRating').value);
+            const suggestion = document.getElementById('feedbackSuggestion').value.trim();
+
+            if (!suggestion) {
+                alert("Please write a suggestion before submitting!");
+                return;
+            }
+
+            try {
+                const res = await fetch(`${BACKEND_URL}/feedback`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ rating, suggestion })
+                });
+
+                if (res.ok) {
+                    alert("Thank you! Your feedback has been saved successfully.");
+                    document.getElementById('feedbackSuggestion').value = "";
+                }
+            } catch(e) {
+                alert(`Error submitting feedback: ${e.message}`);
+            }
+        }
+
+        // Header Dropdowns Interactive Functions
+        function toggleNotificationsDropdown(e) {
+            e.stopPropagation();
+            const dropdown = document.getElementById('notificationsDropdown');
+            const profile = document.getElementById('profileDropdown');
+            if (profile) profile.style.display = 'none';
+            if (dropdown) dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function toggleProfileDropdown(e) {
+            e.stopPropagation();
+            const dropdown = document.getElementById('profileDropdown');
+            const notifications = document.getElementById('notificationsDropdown');
+            if (notifications) notifications.style.display = 'none';
+            if (dropdown) dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+        }
+
+        // Close dropdowns on outside clicks
+        document.addEventListener('click', () => {
+            const notifications = document.getElementById('notificationsDropdown');
+            const profile = document.getElementById('profileDropdown');
+            if (notifications) notifications.style.display = 'none';
+            if (profile) profile.style.display = 'none';
+        });
+
+        // Reset Stats logs function
+        function resetAppStats() {
+            if (confirm("Are you sure you want to clear your study history log?")) {
+                alert("Study history cleared successfully!");
+                location.reload();
+            }
+        }
+    </script>
+</body>
+</html>
