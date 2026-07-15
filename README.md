@@ -7,7 +7,7 @@
 ## 🚀 Project Overview
 **EduGenie** is a state-of-the-art AI-powered personalized learning assistant designed to address the limitations of one-size-fits-all academic education. Traditional learning methodologies often fail to cater to the diverse learning speeds, comprehension levels, and cognitive preferences of individual students. This mismatch in teaching styles can lead to reduced engagement, incomplete topic mastery, and academic stress.
 
-EduGenie bridges this gap by acting as an adaptive learning companion. The application leverages the **Google Gemini API** (`gemini-1.5-flash`) to dynamically tailor any academic topic, difficulty level (Beginner, Intermediate, Advanced), and learning style (Visual, Practical, Verbal, Intuitive) into customized study guides and analogical matrices. It also provides an interactive AI Tutor Chat Room for continuous doubt-clearing, dynamic Practice Quizzes with automated grading, and offline study report compilation using ReportLab PDF generation.
+EduGenie bridges this gap by acting as an adaptive learning companion. The application leverages the **Google Gemini API** (`gemini-2.5-flash`) to dynamically tailor any academic topic, difficulty level (Beginner, Intermediate, Advanced), and learning style (Visual, Practical, Verbal, Intuitive) into customized study guides and analogical matrices. It also provides an interactive AI Tutor Chat Room for continuous doubt-clearing, dynamic Practice Quizzes with automated grading, and offline study report compilation using ReportLab PDF generation.
 
 ---
 
@@ -24,7 +24,7 @@ EduGenie bridges this gap by acting as an adaptive learning companion. The appli
 ## 🛠️ Tech Stack
 - **Backend**: FastAPI, Uvicorn, Pydantic
 - **Frontend**: Streamlit, HTML5, Vanilla JavaScript, CSS3
-- **GenAI Inference Engine**: Google Gemini API (`gemini-1.5-flash`)
+- **GenAI Inference Engine**: Google Gemini API (`gemini-2.5-flash`)
 - **PDF Generation**: ReportLab
 - **Testing**: Pytest, FastAPI TestClient
 
