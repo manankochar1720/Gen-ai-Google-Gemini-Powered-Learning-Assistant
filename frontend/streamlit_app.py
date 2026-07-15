@@ -80,6 +80,10 @@ if os.path.exists(html_file_path):
     
     html_content = html_content.replace("BACKEND_URL_PLACEHOLDER", backend_url)
 
+    # Optional debug print for query parameter
+    if "debug" in st.query_params:
+        st.info(f"🔧 **Debug Info**: Active Backend URL injected is `{backend_url}`")
+
     # Serve full screen (using 680 height to fit typical laptop screens)
     st.components.v1.html(html_content, height=680, scrolling=True)
 else:
