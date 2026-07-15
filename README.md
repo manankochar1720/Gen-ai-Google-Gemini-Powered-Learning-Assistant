@@ -75,3 +75,7 @@ Dynamically creates multiple-choice question sets matching the user's requested 
 ### 4. History Log & Offline PDFs
 Maintains a log of past learning sessions, allowing the user to reload summaries or download offline PDF study guides.
 ![History Log](images/history_log.png)
+
+### 5. Feedback Corner
+Allows users to evaluate their learning curve and submit ratings and suggestions to improve the personalized system.
+![Feedback Corner](images/feedback_corner.png)
