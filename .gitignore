@@ -6,4 +6,8 @@ node_modules/
 feedback.json
 history.json
 .DS_Store
+venv/
+.venv/
+env/
+venv*
 
