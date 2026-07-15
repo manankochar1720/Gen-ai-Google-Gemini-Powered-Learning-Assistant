@@ -67,15 +67,19 @@ Provides an overview of the student's learning journey, including topics explain
 Generates highly customized learning materials using selected difficulty levels and preferred study styles.
 ![Concept Explainer](images/concept_explainer.png)
 
-### 3. Practice Quiz Arena
+### 3. AI Tutor Chat Room
+Allows students to resolve their doubts and ask follow-up questions directly to the Google Gemini AI tutor.
+![AI Tutor Chat](images/ai_tutor_chat.png)
+
+### 4. Practice Quiz Arena
 Dynamically creates multiple-choice question sets matching the user's requested topic and difficulty.
 ![Quiz Setup](images/quiz_setup.png)
 ![Quiz Active](images/quiz_active.png)
 
-### 4. History Log & Offline PDFs
+### 5. History Log & Offline PDFs
 Maintains a log of past learning sessions, allowing the user to reload summaries or download offline PDF study guides.
 ![History Log](images/history_log.png)
 
-### 5. Feedback Corner
+### 6. Feedback Corner
 Allows users to evaluate their learning curve and submit ratings and suggestions to improve the personalized system.
 ![Feedback Corner](images/feedback_corner.png)
