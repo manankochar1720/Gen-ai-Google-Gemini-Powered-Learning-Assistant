@@ -45,7 +45,7 @@ iframe {
 # Serve Single Page HTML Application
 # --------------------------------------------------
 current_dir = os.path.dirname(__file__)
-html_file_path = os.path.join(current_dir, "assets", "index.html")
+html_file_path = os.path.join(current_dir, "assets", "index_v2.html")
 
 if os.path.exists(html_file_path):
     with open(html_file_path, "r", encoding="utf-8") as f:
