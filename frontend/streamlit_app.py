@@ -72,8 +72,12 @@ if os.path.exists(html_file_path):
             workspace_b64 = base64.b64encode(img_file.read()).decode("utf-8")
         html_content = html_content.replace("assets/robot_workspace.png", f"data:image/png;base64,{workspace_b64}")
 
-    # Inject backend URL dynamically from environment variables
-    backend_url = os.environ.get("BACKEND_URL", "http://127.0.0.1:8000/api")
+    # Inject backend URL dynamically (checks Streamlit secrets, then environment variables, then defaults to localhost)
+    if "BACKEND_URL" in st.secrets:
+        backend_url = st.secrets["BACKEND_URL"]
+    else:
+        backend_url = os.environ.get("BACKEND_URL", "http://127.0.0.1:8000/api")
+    
     html_content = html_content.replace("BACKEND_URL_PLACEHOLDER", backend_url)
 
     # Serve full screen (using 680 height to fit typical laptop screens)
