@@ -1479,6 +1479,7 @@
             const item = historyItemsCache[originalIndex];
             if (item && item.type === "explanation") {
                 activeSession = item.response;
+                activeSession.timestamp = item.timestamp;
                 renderExplanationView();
                 switchTab('explain');
             }
@@ -1596,17 +1597,21 @@
         async function downloadExplanationPdf() {
             if (!activeSession) return;
             try {
-                const res = await fetch(`${BACKEND_URL}/pdf/explanation`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(activeSession)
-                });
-                if (res.ok) {
-                    const blob = await res.blob();
-                    const link = document.createElement('a');
-                    link.href = window.URL.createObjectURL(blob);
-                    link.download = `${activeSession.topic.replace(/ /g, "_")}_Guide.pdf`;
-                    link.click();
+                if (activeSession.timestamp) {
+                    window.open(`${BACKEND_URL}/pdf/explanation?timestamp=${encodeURIComponent(activeSession.timestamp)}`, "_blank");
+                } else {
+                    const res = await fetch(`${BACKEND_URL}/pdf/explanation`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(activeSession)
+                    });
+                    if (res.ok) {
+                        const blob = await res.blob();
+                        const link = document.createElement('a');
+                        link.href = window.URL.createObjectURL(blob);
+                        link.download = `${activeSession.topic.replace(/ /g, "_")}_Guide.pdf`;
+                        link.click();
+                    }
                 }
             } catch (e) {
                 alert(`Error downloading PDF: ${e.message}`);
@@ -1833,21 +1838,25 @@
 
         async function downloadQuizPdf(result) {
             try {
-                const payload = {
-                    topic: activeQuizData.topic,
-                    questions: activeQuizData.questions
-                };
-                const res = await fetch(`${BACKEND_URL}/pdf/quiz`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(payload)
-                });
-                if (res.ok) {
-                    const blob = await res.blob();
-                    const link = document.createElement('a');
-                    link.href = window.URL.createObjectURL(blob);
-                    link.download = `${activeQuizData.topic.replace(/ /g, "_")}_Quiz_Report.pdf`;
-                    link.click();
+                if (result && result.timestamp) {
+                    window.open(`${BACKEND_URL}/pdf/quiz?timestamp=${encodeURIComponent(result.timestamp)}`, "_blank");
+                } else {
+                    const payload = {
+                        topic: activeQuizData.topic,
+                        questions: activeQuizData.questions
+                    };
+                    const res = await fetch(`${BACKEND_URL}/pdf/quiz`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(payload)
+                    });
+                    if (res.ok) {
+                        const blob = await res.blob();
+                        const link = document.createElement('a');
+                        link.href = window.URL.createObjectURL(blob);
+                        link.download = `${activeQuizData.topic.replace(/ /g, "_")}_Quiz_Report.pdf`;
+                        link.click();
+                    }
                 }
             } catch (e) {
                 alert(`Error downloading quiz PDF: ${e.message}`);

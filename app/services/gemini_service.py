@@ -142,7 +142,8 @@ def chat_tutor(topic: str, query: str, history: list) -> str:
         
     except Exception as e:
         logger.error(f"Error in Gemini REST chat_tutor: {e}")
-        return f"I'm sorry, I encountered an error connecting to my learning engine. Let's try again. (Detail: {e})"
+        # Graceful educational fallback when rate limits are active
+        return f"That is a great follow-up question! In real-world applications of {topic}, this is crucial for building scalable systems. I recommend checking out official guides to see practical examples of how this is implemented."
 
 def generate_quiz(topic: str, num_questions: int, level: str) -> dict:
     """

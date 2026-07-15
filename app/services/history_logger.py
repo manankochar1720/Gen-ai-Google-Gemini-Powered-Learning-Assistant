@@ -35,3 +35,13 @@ def get_history() -> list:
             return json.load(f)
     except Exception:
         return []
+
+def get_session_by_timestamp(timestamp: str) -> dict:
+    """
+    Retrieves a logged learning session by its timestamp.
+    """
+    history = get_history()
+    for item in history:
+        if item.get("timestamp") == timestamp:
+            return item
+    return None

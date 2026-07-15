@@ -15,6 +15,7 @@ class ExplainResponse(BaseModel):
     mermaid_diagram: str
     key_highlights: List[str]
     study_plan: List[str]
+    timestamp: Optional[str] = None
 
 class ChatMessage(BaseModel):
     role: str = Field(..., description="user or assistant")
@@ -62,6 +63,7 @@ class QuizScoreResponse(BaseModel):
     percentage: float
     feedback: str
     results: List[QuizQuestionResult]
+    timestamp: Optional[str] = None
 
 class FeedbackRequest(BaseModel):
     rating: int = Field(..., description="Rating score from 1 to 5")

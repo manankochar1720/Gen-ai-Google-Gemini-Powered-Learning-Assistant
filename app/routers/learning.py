@@ -25,14 +25,16 @@ def explain(request: ExplainRequest):
         )
         
         # Add timestamp and log to history
+        timestamp = datetime.datetime.now().isoformat()
         session_log = {
-            "timestamp": datetime.datetime.now().isoformat(),
+            "timestamp": timestamp,
             "type": "explanation",
             "request": request.model_dump(),
             "response": explanation_data
         }
         history_logger.save_history(session_log)
         
+        explanation_data["timestamp"] = timestamp
         return explanation_data
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -98,14 +100,16 @@ def evaluate_quiz(request: QuizScoreRequest):
             feedback = "Keep learning! Don't worry, review the topic details, ask the AI Tutor questions, and try again."
             
         # Log quiz results to history
+        timestamp = datetime.datetime.now().isoformat()
         session_log = {
-            "timestamp": datetime.datetime.now().isoformat(),
+            "timestamp": timestamp,
             "type": "quiz",
             "topic": request.topic,
             "score": score,
             "total": total,
             "percentage": percentage,
-            "feedback": feedback
+            "feedback": feedback,
+            "questions": [q.model_dump() for q in request.questions]
         }
         history_logger.save_history(session_log)
         
@@ -114,7 +118,8 @@ def evaluate_quiz(request: QuizScoreRequest):
             "total": total,
             "percentage": percentage,
             "feedback": feedback,
-            "results": results
+            "results": results,
+            "timestamp": timestamp
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -152,6 +157,22 @@ def download_explanation_pdf(data: dict):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@router.get("/pdf/explanation")
+def download_explanation_pdf_get(timestamp: str):
+    try:
+        session = history_logger.get_session_by_timestamp(timestamp)
+        if not session or session.get("type") != "explanation":
+            raise HTTPException(status_code=404, detail="Explanation session not found in history.")
+        explanation_data = session["response"]
+        pdf_buffer = pdf_generator.generate_explanation_pdf(explanation_data)
+        return StreamingResponse(
+            pdf_buffer,
+            media_type="application/pdf",
+            headers={"Content-Disposition": f"attachment; filename=explanation_{explanation_data.get('topic','topic')}.pdf"}
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 @router.post("/pdf/quiz")
 def download_quiz_pdf(data: dict):
     try:
@@ -161,6 +182,25 @@ def download_quiz_pdf(data: dict):
             pdf_buffer,
             media_type="application/pdf",
             headers={"Content-Disposition": "attachment; filename=quiz.pdf"}
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/pdf/quiz")
+def download_quiz_pdf_get(timestamp: str):
+    try:
+        session = history_logger.get_session_by_timestamp(timestamp)
+        if not session or session.get("type") != "quiz":
+            raise HTTPException(status_code=404, detail="Quiz session not found in history.")
+        pdf_data = {
+            "topic": session.get("topic", "Quiz"),
+            "questions": session.get("questions", [])
+        }
+        pdf_buffer = pdf_generator.generate_quiz_pdf(pdf_data)
+        return StreamingResponse(
+            pdf_buffer,
+            media_type="application/pdf",
+            headers={"Content-Disposition": f"attachment; filename=quiz_{pdf_data['topic'].replace(' ', '_')}.pdf"}
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
